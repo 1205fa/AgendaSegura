@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/item_contato_background"
+    android:padding="15dp"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:id="@+id/tvNomeContato"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nome do Contato"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvTelefoneContato"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="(11) 99999-9999"
+        android:textColor="@color/neon_green"
+        android:textSize="14sp"
+        android:layout_marginTop="5dp"/>
+
+</LinearLayout>
+Salve: Ctrl+O, Enter, Ctrl+X
+
+PASSO 16: Background do Item Contato
+nano app/src/main/res/drawable/item_contato_background.xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#1A1A1A"/>
+    <corners android:radius="10dp"/>
+    <stroke android:width="1dp" android:color="@color/neon_cyan"/>
+</shape>

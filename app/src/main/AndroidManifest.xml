@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.exemplo.agendasegura">
+
+    <!-- Permissões SMS -->
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    
+    <!-- Permissões Camera e Galeria -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    
+    <!-- Permissões Telefone -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    
+    <!-- Features Camera -->
+    <uses-feature android:name="android.hardware.camera" android:required="true"/>
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
+
+    <application
+        android:allowBackup="true"
+        android:label="AgendaSegura"
+        android:icon="@drawable/cofre"
+        android:theme="@style/AppTheme">
+        
+        <!-- Tela Principal (Login) -->
+        <activity android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <!-- Tela de Cadastro -->
+        <activity android:name=".CadastroActivity"
+            android:screenOrientation="portrait"/>
+        
+        <!-- Tela Principal da Agenda -->
+        <activity android:name=".AgendaActivity"
+            android:screenOrientation="portrait"/>
+        
+        <!-- Tela de Adicionar Contato -->
+        <activity android:name=".AdicionarContatoActivity"
+            android:screenOrientation="portrait"/>
+        
+        <!-- Tela de Galeria -->
+        <activity android:name=".GaleriaActivity"
+            android:screenOrientation="portrait"/>
+
+        <!-- FileProvider para Android 7+ -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.exemplo.agendasegura.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+        
+    </application>
+</manifest>
