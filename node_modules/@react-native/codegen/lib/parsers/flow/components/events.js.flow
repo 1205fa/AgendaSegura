@@ -11,32 +11,32 @@
 'use strict';
 
 import type {
+  EventTypeAnnotation,
   EventTypeShape,
   NamedShape,
-  EventTypeAnnotation,
 } from '../../../CodegenSchema.js';
 import type {Parser} from '../../parser';
 import type {EventArgumentReturnType} from '../../parsers-commons';
 
 const {
-  throwIfEventHasNoName,
-  throwIfBubblingTypeIsNull,
   throwIfArgumentPropsAreNull,
+  throwIfBubblingTypeIsNull,
+  throwIfEventHasNoName,
 } = require('../../error-utils');
 const {
-  getEventArgument,
   buildPropertiesForEvent,
-  handleEventHandler,
   emitBuildEventSchema,
+  getEventArgument,
+  handleEventHandler,
 } = require('../../parsers-commons');
 const {
   emitBoolProp,
   emitDoubleProp,
   emitFloatProp,
-  emitMixedProp,
-  emitStringProp,
   emitInt32Prop,
+  emitMixedProp,
   emitObjectProp,
+  emitStringProp,
   emitUnionProp,
 } = require('../../parsers-primitives');
 
@@ -115,10 +115,11 @@ function extractArrayElementType(
       };
     case 'UnionTypeAnnotation':
       return {
-        type: 'StringEnumTypeAnnotation',
-        options: typeAnnotation.types.map(option =>
-          parser.getLiteralValue(option),
-        ),
+        type: 'StringLiteralUnionTypeAnnotation',
+        types: typeAnnotation.types.map(option => ({
+          type: 'StringLiteralTypeAnnotation',
+          value: parser.getLiteralValue(option),
+        })),
       };
     case 'UnsafeMixed':
       return {type: 'MixedTypeAnnotation'};

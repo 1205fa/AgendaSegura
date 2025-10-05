@@ -1,19 +1,64 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-export default function App() {
+// ===================================
+// IMPORTAÇÃO DE TODAS AS TELAS
+// ===================================
+import LoginScreen from './app/screens/LoginScreen';
+import CofreScreen from './app/screens/CofreScreen'; 
+import ContatosScreen from './app/screens/ContatosScreen'; 
+import CofreGalleryScreen from './app/screens/CofreGalleryScreen';
+import ContatosCofreScreen from './app/screens/ContatosCofreScreen'; // <-- NOVO: Tela do Cofre de Contatos
+
+// Cria o objeto que gerencia as telas
+const Stack = createNativeStackNavigator();
+
+function AppStack() {
   return (
-    <View style={styles.container}>
-      <Text>Olá, mundo! Este é o meu aplicativo Expo.</Text>
-    </View>
+    <Stack.Navigator initialRouteName="Login">
+      {/* 1. Tela de Login (Rota Inicial) */}
+      <Stack.Screen 
+        name="Login" 
+        component={LoginScreen} 
+        options={{ headerShown: false }} 
+      />
+      
+      {/* 2. Tela principal do Cofre (Após o Login) */}
+      <Stack.Screen 
+        name="Cofre" 
+        component={CofreScreen} 
+        options={{ title: 'AgendaSegura' }}
+      />
+
+      {/* 3. Tela de Seleção de Contatos */}
+      <Stack.Screen 
+        name="Contatos" // Nome usado para navegação
+        component={ContatosScreen} 
+        options={{ title: 'Adicionar Contato' }}
+      />
+      
+      {/* 4. Tela de Visualização do Cofre (GALERIA DE MÍDIAS) */}
+      <Stack.Screen 
+        name="CofreGallery" // Nome usado para navegação
+        component={CofreGalleryScreen} 
+        options={{ title: 'Galeria Secreta' }}
+      />
+
+      {/* 5. TELA DE VISUALIZAÇÃO E RESTAURAÇÃO DE CONTATOS ESCONDIDOS */}
+      <Stack.Screen 
+        name="ContatosCofre" 
+        component={ContatosCofreScreen} 
+        options={{ title: 'Cofre de Contatos' }}
+      />
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <AppStack />
+    </NavigationContainer>
+  );
+}

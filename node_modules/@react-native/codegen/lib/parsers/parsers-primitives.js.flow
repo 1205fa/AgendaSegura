@@ -11,57 +11,58 @@
 'use strict';
 
 import type {
-  Nullable,
   BooleanTypeAnnotation,
   DoubleTypeAnnotation,
   EventTypeAnnotation,
+  FloatTypeAnnotation,
   Int32TypeAnnotation,
   NamedShape,
   NativeModuleAliasMap,
-  NativeModuleEnumMap,
   NativeModuleBaseTypeAnnotation,
-  NativeModuleTypeAnnotation,
-  NativeModuleFloatTypeAnnotation,
+  NativeModuleEnumDeclaration,
+  NativeModuleEnumMap,
   NativeModuleFunctionTypeAnnotation,
   NativeModuleGenericObjectTypeAnnotation,
   NativeModuleMixedTypeAnnotation,
   NativeModuleNumberTypeAnnotation,
+  NativeModuleObjectTypeAnnotation,
   NativeModulePromiseTypeAnnotation,
   NativeModuleTypeAliasTypeAnnotation,
+  NativeModuleTypeAnnotation,
   NativeModuleUnionTypeAnnotation,
+  Nullable,
+  NumberLiteralTypeAnnotation,
   ObjectTypeAnnotation,
   ReservedTypeAnnotation,
+  StringLiteralTypeAnnotation,
+  StringLiteralUnionTypeAnnotation,
   StringTypeAnnotation,
   VoidTypeAnnotation,
-  NativeModuleObjectTypeAnnotation,
-  NativeModuleEnumDeclaration,
 } from '../CodegenSchema';
 import type {Parser} from './parser';
 import type {
   ParserErrorCapturer,
-  TypeResolutionStatus,
   TypeDeclarationMap,
+  TypeResolutionStatus,
 } from './utils';
-
-const {
-  UnsupportedUnionTypeAnnotationParserError,
-  UnsupportedTypeAnnotationParserError,
-  ParserError,
-} = require('./errors');
 
 const {
   throwIfArrayElementTypeAnnotationIsUnsupported,
   throwIfPartialNotAnnotatingTypeParameter,
   throwIfPartialWithMoreParameter,
 } = require('./error-utils');
-const {nullGuard} = require('./parsers-utils');
+const {
+  ParserError,
+  UnsupportedTypeAnnotationParserError,
+  UnsupportedUnionTypeAnnotationParserError,
+} = require('./errors');
 const {
   assertGenericTypeAnnotationHasExactlyOneTypeParameter,
-  wrapNullable,
-  unwrapNullable,
   translateFunctionTypeAnnotation,
+  unwrapNullable,
+  wrapNullable,
 } = require('./parsers-commons');
-
+const {nullGuard} = require('./parsers-utils');
 const {isModuleRegistryCall} = require('./utils');
 
 function emitBoolean(nullable: boolean): Nullable<BooleanTypeAnnotation> {
@@ -170,9 +171,29 @@ function emitMixed(
   });
 }
 
+function emitNumberLiteral(
+  nullable: boolean,
+  value: number,
+): Nullable<NumberLiteralTypeAnnotation> {
+  return wrapNullable(nullable, {
+    type: 'NumberLiteralTypeAnnotation',
+    value,
+  });
+}
+
 function emitString(nullable: boolean): Nullable<StringTypeAnnotation> {
   return wrapNullable(nullable, {
     type: 'StringTypeAnnotation',
+  });
+}
+
+function emitStringLiteral(
+  nullable: boolean,
+  value: string,
+): Nullable<StringLiteralTypeAnnotation> {
+  return wrapNullable(nullable, {
+    type: 'StringLiteralTypeAnnotation',
+    value,
   });
 }
 
@@ -318,6 +339,9 @@ function emitPromise(
   ) {
     return wrapNullable(nullable, {
       type: 'PromiseTypeAnnotation',
+      elementType: {
+        type: 'VoidTypeAnnotation',
+      },
     });
   } else {
     try {
@@ -337,6 +361,9 @@ function emitPromise(
     } catch {
       return wrapNullable(nullable, {
         type: 'PromiseTypeAnnotation',
+        elementType: {
+          type: 'VoidTypeAnnotation',
+        },
       });
     }
   }
@@ -370,9 +397,7 @@ function emitObject(
   });
 }
 
-function emitFloat(
-  nullable: boolean,
-): Nullable<NativeModuleFloatTypeAnnotation> {
+function emitFloat(nullable: boolean): Nullable<FloatTypeAnnotation> {
   return wrapNullable(nullable, {
     type: 'FloatTypeAnnotation',
   });
@@ -396,7 +421,14 @@ function emitUnion(
   hasteModuleName: string,
   typeAnnotation: $FlowFixMe,
   parser: Parser,
-): Nullable<NativeModuleUnionTypeAnnotation> {
+): Nullable<
+  NativeModuleUnionTypeAnnotation | StringLiteralUnionTypeAnnotation,
+> {
+  // Get all the literals by type
+  // Verify they are all the same
+  // If string, persist as StringLiteralUnionType
+  // If number, persist as NumberTypeAnnotation (TODO: Number literal)
+
   const unionTypes = parser.remapUnionTypeAnnotationMemberNames(
     typeAnnotation.types,
   );
@@ -410,9 +442,39 @@ function emitUnion(
     );
   }
 
+  if (unionTypes[0] === 'StringTypeAnnotation') {
+    // Reprocess as a string literal union
+    return emitStringLiteralUnion(
+      nullable,
+      hasteModuleName,
+      typeAnnotation,
+      parser,
+    );
+  }
+
   return wrapNullable(nullable, {
     type: 'UnionTypeAnnotation',
     memberType: unionTypes[0],
+  });
+}
+
+function emitStringLiteralUnion(
+  nullable: boolean,
+  hasteModuleName: string,
+  typeAnnotation: $FlowFixMe,
+  parser: Parser,
+): Nullable<StringLiteralUnionTypeAnnotation> {
+  const stringLiterals =
+    parser.getStringLiteralUnionTypeAnnotationStringLiterals(
+      typeAnnotation.types,
+    );
+
+  return wrapNullable(nullable, {
+    type: 'StringLiteralUnionTypeAnnotation',
+    types: stringLiterals.map(stringLiteral => ({
+      type: 'StringLiteralTypeAnnotation',
+      value: stringLiteral,
+    })),
   });
 }
 
@@ -470,6 +532,9 @@ function translateArrayTypeAnnotation(
   } catch (ex) {
     return wrapNullable(nullable, {
       type: 'ArrayTypeAnnotation',
+      elementType: {
+        type: 'AnyTypeAnnotation',
+      },
     });
   }
 }
@@ -605,6 +670,7 @@ function emitCommonTypes(
     typeAnnotation.type,
   );
 
+  // $FlowFixMe[invalid-computed-prop]
   const simpleEmitter = typeMap[typeAnnotationName];
   if (simpleEmitter) {
     return simpleEmitter(nullable);
@@ -613,6 +679,7 @@ function emitCommonTypes(
   const genericTypeAnnotationName =
     parser.getTypeAnnotationName(typeAnnotation);
 
+  // $FlowFixMe[invalid-computed-prop]
   const emitter = typeMap[genericTypeAnnotationName];
   if (!emitter) {
     return null;
@@ -685,10 +752,11 @@ function emitUnionProp(
     name,
     optional,
     typeAnnotation: {
-      type: 'StringEnumTypeAnnotation',
-      options: typeAnnotation.types.map(option =>
-        parser.getLiteralValue(option),
-      ),
+      type: 'StringLiteralUnionTypeAnnotation',
+      types: typeAnnotation.types.map(option => ({
+        type: 'StringLiteralTypeAnnotation',
+        value: parser.getLiteralValue(option),
+      })),
     },
   };
 }
@@ -706,6 +774,7 @@ module.exports = {
   emitInt32Prop,
   emitMixedProp,
   emitNumber,
+  emitNumberLiteral,
   emitGenericObject,
   emitDictionary,
   emitObject,
@@ -715,6 +784,7 @@ module.exports = {
   emitString,
   emitStringish,
   emitStringProp,
+  emitStringLiteral,
   emitMixed,
   emitUnion,
   emitPartial,

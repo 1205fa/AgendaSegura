@@ -3,10 +3,26 @@
     "name": "AgendaSegura",
     "slug": "agenda-segura",
     "version": "1.0.0",
-    "sdkVersion": "50.0.0",
-    "platforms": ["android", "ios", "web"],
+    "platforms": [
+      "android",
+      "ios",
+      "web"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "99fdcca2-c6e4-4bb0-955b-e303aa2b53e0"
+      }
+    },
+    "owner": "fabriciopinheirsantos",
     "android": {
-      "package": "com.fabricio.agendasegura"
-    }
+      "package": "com.fabriciopinheirsantos.agendasegura"
+    },
+    "ios": {
+      "bundleIdentifier": "com.fabriciopinheirsantos.agendasegura"
+    },
+    "plugins": [
+      "expo-av",
+      "expo-contacts"
+    ]
   }
 }
