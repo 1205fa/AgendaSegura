@@ -1,27 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react'; // Adicionado useState
 import { View, Text, StyleSheet, TextInput, Button, Alert, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import * as SecureStore from 'expo-secure-store'; // Importado para checar a senha
+import * as SecureStore from 'expo-secure-store'; 
 
-// Caminho para a imagem do cofre. Se a imagem não aparecer, ajuste aqui.
-import CofreImage from '../../imgem/cofre.png'; 
+// Caminho CORRIGIDO para a imagem do logo (usando o arquivo que está em assets/)
+import CofreImage from '../../assets/meu_logo_final.png'; 
 
 // --- CHAVE DE SEGURANÇA MESTRA ---
-const PASSWORD_KEY = "userPassword"; // Chave onde a senha é salva em SecureStore
+const PASSWORD_KEY = "userPassword"; 
 
 export default function LoginScreen() {
-  // Inicializa o objeto de navegação para usar em 'onPress'
   const navigation = useNavigation(); 
-  const [password, setPassword] = useState(''); // Adicionado para gerenciar a senha digitada
+  const [password, setPassword] = useState(''); 
 
   // 1. Função que será executada ao clicar no botão 'Entrar'
   const handleLogin = async () => {
     // Lógica de verificação de senha REAL
     const savedPassword = await SecureStore.getItemAsync(PASSWORD_KEY);
     
+    // Se não houver senha salva, o cliente é levado para a tela de Cofre 
+    // (que o forçará a criar uma senha mestra, corrigindo o bug de segurança)
     if (!savedPassword) {
-        Alert.alert("Aviso", "Nenhuma senha mestra foi definida. A navegação será liberada para criar uma senha.");
-        // Navegação temporária para o cofre para o cliente poder definir a senha.
         navigation.navigate('Cofre');
         return;
     }
@@ -33,9 +32,8 @@ export default function LoginScreen() {
     }
   };
 
-  // 2. Função para o link de recuperação de senha (CORRIGIDA)
+  // 2. Função para o link de recuperação de senha 
   const handleForgotPassword = () => {
-    // NAVEGA PARA A NOVA TELA DE RECUPERAÇÃO QUE CRIAMOS
     navigation.navigate('Recovery'); 
   };
 
@@ -55,7 +53,7 @@ export default function LoginScreen() {
         style={styles.input}
         placeholder="Digite sua Senha"
         secureTextEntry
-        onChangeText={setPassword} // Adicionado para capturar a senha digitada
+        onChangeText={setPassword} 
       />
       
       {/* 3. Botão de Login Principal */}
