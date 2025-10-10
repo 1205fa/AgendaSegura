@@ -9,7 +9,8 @@ import LoginScreen from './app/screens/LoginScreen';
 import CofreScreen from './app/screens/CofreScreen'; 
 import ContatosScreen from './app/screens/ContatosScreen'; 
 import CofreGalleryScreen from './app/screens/CofreGalleryScreen';
-import ContatosCofreScreen from './app/screens/ContatosCofreScreen'; // <-- NOVO: Tela do Cofre de Contatos
+import ContatosCofreScreen from './app/screens/ContatosCofreScreen';
+import RecoveryScreen from './app/screens/RecoveryScreen'; // <-- NOVA: Tela de Recuperação
 
 // Cria o objeto que gerencia as telas
 const Stack = createNativeStackNavigator();
@@ -33,14 +34,14 @@ function AppStack() {
 
       {/* 3. Tela de Seleção de Contatos */}
       <Stack.Screen 
-        name="Contatos" // Nome usado para navegação
+        name="Contatos" 
         component={ContatosScreen} 
         options={{ title: 'Adicionar Contato' }}
       />
       
       {/* 4. Tela de Visualização do Cofre (GALERIA DE MÍDIAS) */}
       <Stack.Screen 
-        name="CofreGallery" // Nome usado para navegação
+        name="CofreGallery" 
         component={CofreGalleryScreen} 
         options={{ title: 'Galeria Secreta' }}
       />
@@ -50,6 +51,13 @@ function AppStack() {
         name="ContatosCofre" 
         component={ContatosCofreScreen} 
         options={{ title: 'Cofre de Contatos' }}
+      />
+
+      {/* 6. TELA DE RECUPERAÇÃO DE SENHA */}
+      <Stack.Screen 
+        name="Recovery" 
+        component={RecoveryScreen} 
+        options={{ title: 'Recuperação de Senha' }}
       />
     </Stack.Navigator>
   );

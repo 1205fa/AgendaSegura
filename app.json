@@ -8,6 +8,12 @@
       "ios",
       "web"
     ],
+    "splash": {
+      "image": "./assets/meu_logo_final.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "icon": "./assets/meu_logo_final.png",
     "extra": {
       "eas": {
         "projectId": "99fdcca2-c6e4-4bb0-955b-e303aa2b53e0"
@@ -15,14 +21,19 @@
     },
     "owner": "fabriciopinheirsantos",
     "android": {
-      "package": "com.fabriciopinheirsantos.agendasegura"
+      "package": "com.fabriciopinheirsantos.agendasegura",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/meu_logo_final.png",
+        "backgroundColor": "#FFFFFF"
+      }
     },
     "ios": {
       "bundleIdentifier": "com.fabriciopinheirsantos.agendasegura"
     },
     "plugins": [
       "expo-av",
-      "expo-contacts"
+      "expo-contacts",
+      "expo-secure-store"
     ]
   }
 }
